@@ -1,0 +1,29 @@
+-- An SQL script that creates a stored procedure ComputeAverageScoreForUser
+-- that computes and stores the average score for a student.
+-- NOTE: An average score can be a decimal
+-- Requirements:
+-- Procedure ComputeAverageScoreForUser is taking 1 input:
+--   user_id, a users.id value (you can assume user_id is linked to an existing users)
+
+DELIMITER $$;
+CREATE PROCEDURE ComputeAverageScoreForUser (IN user_id INT)
+BEGIN
+	-- Declare variables
+	DECLARE total_score DECIMAL(10, 2);
+	DECLARE count_scores INT;
+
+	-- Calculate total score and count of scores for the user
+	SELECT SUM(score), COUNT(score)
+	INTO total_score, count_scores
+	FROM scores
+	WHERE user_id = user_id;
+
+	-- Compute average score and insert/update the user's average score in the users table
+	IF count_scores > 0 THEN
+		SET @average_score = total_score / count_scores;
+		UPDATE users
+		SET average_score = @average_score
+		WHERE id = user_id;
+	END IF;
+END;$$
+DELIMITER ;
