@@ -8,22 +8,9 @@
 DELIMITER $$;
 CREATE PROCEDURE ComputeAverageScoreForUser (IN user_id INT)
 BEGIN
-	-- Declare variables
-	DECLARE total_score DECIMAL 10, 2;
-	DECLARE count_scores INT;
-
-	-- Calculate total score and count of scores for the user
-	SELECT SUM(score), COUNT(score)
-	INTO total_score, count_scores
-	FROM scores
-	WHERE user_id = user_id;
-
-	-- Compute average score and insert/update the user's average score in the users table
-	IF count_scores > 0 THEN
-		SET @average_score = total_score / count_scores;
-		UPDATE users
-		SET average_score = @average_score
-		WHERE id = user_id;
-	END IF;
-END;
-DELIMITER;$$
+	UPDATE users
+	SET average_score=(SELECT AVG(score) FROM corrections
+			     WHERE corrections.user_id=user_id)
+	WHERE id=user_id;
+END;$$
+DELIMITER ;
