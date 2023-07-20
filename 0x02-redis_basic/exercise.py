@@ -8,14 +8,25 @@ return the key. Type-annotate store correctly. Remember that data can be a
 str, bytes, int or float"""
 import redis
 import uuid
+from functools import wraps
 from typing import Union, Callable
 
+def count_calls(method: Callable) -> Callable:
+    key = method.__qualname__
+
+    @wraps(method)
+    def wrapper(self, data: Union[str, bytes, int, float]) -> str:
+        self._redis.incr(key)
+        return method(self, data)
+
+    return wrapper
 
 class Cache:
     def __init__(self):
         self._redis = redis.Redis()
         self._redis.flushdb()
 
+    @count_calls
     def store(self, data: Union[str, bytes, int, float]) -> str:
         key = str(uuid.uuid4())
         self._redis.set(key, data)
