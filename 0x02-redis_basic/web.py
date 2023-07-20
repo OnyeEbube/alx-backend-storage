@@ -32,7 +32,7 @@ def url_access_count(method):
         if cached_value:
             return cached_value.decode("utf-8")
 
-            # Get new content and update cache
+        # Get new content and update cache
         key_count = "count:" + url
         html_content = method(url)
 
