@@ -23,13 +23,13 @@ def call_history(method: Callable) -> Callable:
         input_args = str(data)
         self._redis.rpush(inputs_key, input_args)
 
-        output = method(self, data) 
+        output = method(self, data)
+        
         self._redis.rpush(outputs_key, str(output))
 
         return output
 
     return wrapper
-
 
 class Cache:
     def __init__(self):
@@ -42,8 +42,7 @@ class Cache:
         self._redis.set(key, data)
         return key
 
-    def get(self, key: str, fn: Callable = None) ->\
-            Union[str, bytes, int, float]:
+    def get(self, key: str, fn: Callable = None) -> Union[str, bytes, int, float]:
         data = self._redis.get(key)
         if data is None:
             return None
